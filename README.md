@@ -20,4 +20,4 @@ Una aplicación simple de lista de tareas construida como proyecto de práctica 
 Este proyecto fue creado para practicar los fundamentos de maquetación web, manejo de Flexbox y el uso de variables CSS para temas.
 
 ---
-Creado por **Atreus-Distro]**
+Creado por **Atreus-Distro**
