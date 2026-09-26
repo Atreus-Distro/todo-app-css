@@ -1,0 +1,203 @@
+:root {
+
+    --color-fondo: #1a2332;
+    --color-input: #2d3a4f;
+    --color-texto: #ffffff;
+    --color-rojo: #ef4444;
+    --color-verde: #10b981;
+    --color-morado: #8b5cf6;
+}
+
+
+
+@media (prefers-color-scheme: light) {
+    :root {
+
+        --color-fondo: #f5f5f5;
+        --color-input: #e0e0e0;
+        --color-texto: #1a2332;
+        
+    }
+}
+
+
+
+
+
+body {
+
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    padding: 20px;
+
+}
+
+.task-list{
+
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.input-group {
+
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.input-group input {
+    
+    flex: 1;
+   
+}
+
+.task {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background-color: var(--color-input);
+
+}
+
+.task-text {
+
+    flex: 1;
+}
+
+.input-group button {
+
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--color-morado);
+    color: white;
+    border: none;
+    font-size: 30px;
+    cursor: pointer;
+   
+    
+}
+
+
+.error-input{
+
+flex-basis: 100%;
+font-size: 16px;
+color: var(--color-rojo);
+margin: 5px 0 0 0;
+
+
+}
+
+
+
+
+.task .delete {
+
+    background-color: var(--color-rojo);
+    cursor: pointer;
+    border: none;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    color: white;
+
+}
+
+.task .complete {
+
+ background-color: var(--color-verde);
+    cursor: pointer;
+    border: none;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    color: white;
+
+
+}
+
+.counters {
+
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+    
+}
+
+
+
+.counter {
+    padding: 8px 15px;
+    border-radius: 5px;
+    color: white;
+    font-size: 14px;
+}
+
+
+
+.counter.total {
+    background-color: var(--color-morado);
+}
+
+.counter.completed {
+    background-color: var(--color-verde);
+}
+
+.counter.incompleted {
+    background-color: var(--color-rojo);
+}
+
+
+
+.task.completed .task-text {
+    text-decoration: line-through;
+}
+
+.task.completed {
+
+    opacity: 0.6;
+}
+
+.input-group button:hover,
+.task .delete:hover,
+.task .complete:hover {
+    filter: brightness(1.2);
+}
+
+.input-group button:active,
+.task .delete:active,
+.task .complete:active {
+    transform: scale(0.95);
+}
+
+
+
+@media (max-width: 600px) {
+
+    body {
+
+        padding: 10px;
+    }
+    
+    .task .delete,
+    .task .complete,
+    .input-group button {
+
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+
+    }
+
+    .counter {
+
+        padding:  6px 10px;
+        font-size: 12px;
+    }
+}
