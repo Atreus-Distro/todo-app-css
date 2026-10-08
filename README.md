@@ -22,6 +22,7 @@ Una aplicación simple de lista de tareas construida como proyecto de práctica 
 *   Diseño responsive (móvil y escritorio)
 *   Tema claro y oscuro automático
 *   Estados hover y active en botones
+*   Se agregó persistencia mediante localStorage.
 
 ## 📝 Aprendizajes
 
