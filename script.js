@@ -21,8 +21,71 @@ mensajeError.style.display = "none";
 
 let tareas = [];
 
+
+
+
+
+
+const tareasGuardadas = localStorage.getItem("tareas");
+if (tareasGuardadas) {
+    tareas =JSON.parse(tareasGuardadas);
+}
+
+
+// Funciones:
+
+function guardarTareas() {
+    localStorage.setItem("tareas", JSON.stringify(tareas));
+}
+
+
+function actualizarContadores(){
+    const total = tareas.length;
+    const completadas = tareas.filter(tarea => tarea.completada).length;
+    const incompletas = total - completadas;
+
+    contadorTotal.textContent = `Total: ${total}`;
+    contadorCompleted.textContent = `Completed: ${completadas}`;
+    contadorIncompleted.textContent = `Incompleted: ${incompletas}`;
+
+
+}
+
+function crearLiDeTarea(tarea) {
+    const li = document.createElement("li");
+    li.classList.add("task");
+    if (tarea.completada) {
+        li.classList.add("completed");
+
+    }
+    li.innerHTML = `
+    <button class="delete">X</button>
+    <span class="task-text">${tarea.texto}</span>
+    <button class="complete">✓</button>
+    `;
+    return li;
+}
+
+
+function renderizarTareas() {
+    tareas.forEach(function(tarea) {
+        const li = crearLiDeTarea(tarea);
+        listaTareas.appendChild(li);
+    });
+}
+
+
+
+
+// Llamadas Iniciales:
+
+
+renderizarTareas();
 actualizarContadores();
 
+
+
+// Boton de agregar.
 
 btnAgregar.addEventListener("click", function() {
     const texto = input.value.trim();
@@ -36,29 +99,23 @@ btnAgregar.addEventListener("click", function() {
     tareas = [...tareas, nuevaTarea];
     console.log (tareas);
 
-    const li = document.createElement("li");
-    li.classList.add("task");
-    li.innerHTML = `
-    <button class="delete">X</button>
-    <span class="task-text">${texto}</span>
-    <button class="complete">✓</button>
-
-    `;
+    const li = crearLiDeTarea(nuevaTarea);
     listaTareas.appendChild(li);
 
     input.value="";
 
     actualizarContadores();
-
-
-
-
+    
+    guardarTareas();
 
 }
     
  
 
 });
+
+
+// Lista de tareas:
 
 
 listaTareas.addEventListener("click", function(evento) {
@@ -72,6 +129,8 @@ listaTareas.addEventListener("click", function(evento) {
         console.log(tareas);
 
         actualizarContadores();
+    
+        guardarTareas();
         
             
     }
@@ -92,22 +151,12 @@ listaTareas.addEventListener("click", function(evento) {
     });
 
     actualizarContadores();
+    
+    guardarTareas();
 
 }
 
 });
 
-
-function actualizarContadores(){
-    const total = tareas.length;
-    const completadas = tareas.filter(tarea => tarea.completada).length;
-    const incompletas = total - completadas;
-
-    contadorTotal.textContent = `Total: ${total}`;
-    contadorCompleted.textContent = `Completed: ${completadas}`;
-    contadorIncompleted.textContent = `Incompleted: ${incompletas}`;
-
-
-}
 
 
