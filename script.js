@@ -1,45 +1,19 @@
-
-
-
+import tareaService from "./tareaService.js";
 
 const input = document.querySelector(".input-group input");
-
 const btnAgregar = document.querySelector(".input-group button");
-
 const mensajeError = document.querySelector(".error-input");
-
 const listaTareas = document.querySelector(".task-list");
-
 const contadorTotal = document.querySelector(".counter.total");
-
 const contadorCompleted = document.querySelector(".counter.completed");
-
 const contadorIncompleted = document.querySelector(".counter.incompleted");
-
 
 mensajeError.style.display = "none";
 
 let tareas = [];
 
-
-
-
-
-
-const tareasGuardadas = localStorage.getItem("tareas");
-if (tareasGuardadas) {
-    tareas =JSON.parse(tareasGuardadas);
-}
-
-
-// Funciones:
-
-function guardarTareas() {
-    localStorage.setItem("tareas", JSON.stringify(tareas));
-}
-
-
-function actualizarContadores(){
+// Funciones
+function actualizarContadores() {
     const total = tareas.length;
     const completadas = tareas.filter(tarea => tarea.completada).length;
     const incompletas = total - completadas;
@@ -47,8 +21,6 @@ function actualizarContadores(){
     contadorTotal.textContent = `Total: ${total}`;
     contadorCompleted.textContent = `Completed: ${completadas}`;
     contadorIncompleted.textContent = `Incompleted: ${incompletas}`;
-
-
 }
 
 function crearLiDeTarea(tarea) {
@@ -56,16 +28,14 @@ function crearLiDeTarea(tarea) {
     li.classList.add("task");
     if (tarea.completada) {
         li.classList.add("completed");
-
     }
     li.innerHTML = `
-    <button class="delete">X</button>
-    <span class="task-text">${tarea.texto}</span>
-    <button class="complete">✓</button>
+        <button class="delete">X</button>
+        <span class="task-text">${tarea.texto}</span>
+        <button class="complete">✓</button>
     `;
     return li;
 }
-
 
 function renderizarTareas() {
     tareas.forEach(function(tarea) {
@@ -74,89 +44,95 @@ function renderizarTareas() {
     });
 }
 
+async function cargarTareas() {
+    try {
+        const datosDelServidor = await tareaService.getAllFromServer();
 
+        tareas = datosDelServidor.map(tarea => ({
+            id: tarea.id,
+            texto: tarea.texto,
+            completada: tarea.completada
+        }));
 
+        renderizarTareas();
+        actualizarContadores();
+    } catch (error) {
+        console.error("Error al cargar tareas:", error);
+    }
+}
 
-// Llamadas Iniciales:
+// Llamada inicial
+cargarTareas();
 
+// Eventos (en Fase 2 los conectaremos al servidor)
 
-renderizarTareas();
-actualizarContadores();
-
-
-
-// Boton de agregar.
-
-btnAgregar.addEventListener("click", function() {
+btnAgregar.addEventListener("click", async function() {
     const texto = input.value.trim();
 
     if (!texto) {
-    mensajeError.style.display = "block";
-} else {
+        mensajeError.style.display = "block";
+    } else {
+        mensajeError.style.display = "none";
 
-    mensajeError.style.display = "none";
-    const nuevaTarea = {texto: texto, completada:false };
-    tareas = [...tareas, nuevaTarea];
-    console.log (tareas);
+        const nuevaTarea = await tareaService.addOne({
+            texto: texto,
+            completada: false
+        });
+        
 
-    const li = crearLiDeTarea(nuevaTarea);
-    listaTareas.appendChild(li);
+        // Agregar el array y al html
 
-    input.value="";
+        tareas =[...tareas,nuevaTarea];
+        const li = crearLiDeTarea(nuevaTarea);
+        listaTareas.appendChild(li);
 
-    actualizarContadores();
-    
-    guardarTareas();
-
-}
-    
- 
-
+        input.value = "";
+        actualizarContadores();
+    }
 });
 
 
-// Lista de tareas:
 
 
-listaTareas.addEventListener("click", function(evento) {
+// Eventos de eliminar y completar:
+listaTareas.addEventListener("click", async function(evento) {
+
+    // 1. ELIMINAR
     if (evento.target.classList.contains("delete")) {
         const li = evento.target.closest(".task");
         const textoEliminar = li.querySelector(".task-text").textContent;
 
-        tareas = tareas.filter(tarea=>tarea.texto !== textoEliminar);
-        li.remove();
+        const tareaEliminar = tareas.find(tarea => tarea.texto === textoEliminar);
 
-        console.log(tareas);
-
-        actualizarContadores();
-    
-        guardarTareas();
-        
+        if (tareaEliminar) {
+            await tareaService.deleteOne(tareaEliminar.id); // Ojo: deleteOne (sin 'te')
             
+            tareas = tareas.filter(tarea => tarea.id !== tareaEliminar.id);
+            li.remove();
+            actualizarContadores();
+        }
     }
 
+    // 2. COMPLETAR
     if (evento.target.classList.contains("complete")) {
-    const li = evento.target.closest(".task");
-    const textoCompletar = li.querySelector(".task-text").textContent;
+        const li = evento.target.closest(".task");
+        const textoCompletar = li.querySelector(".task-text").textContent;
 
-    li.classList.toggle("completed");
+        const tareaACompletar = tareas.find(tarea => tarea.texto === textoCompletar);
 
-    tareas = tareas.map(function(tarea) {
-        if (tarea.texto === textoCompletar) {
-            return {...tarea, completada: !tarea.completada};
+        if (tareaACompletar) {
+            await tareaService.updateOne(tareaACompletar.id, {
+                completada: !tareaACompletar.completada
+            });
+
+            li.classList.toggle("completed");
+            tareas = tareas.map(tarea => {
+                if (tarea.id === tareaACompletar.id) {
+                    return { ...tarea, completada: !tarea.completada };
+                }
+                return tarea;
+            });
+            actualizarContadores();
         }
-
-        return tarea;   
-        
-    });
-
-    actualizarContadores();
-    
-    guardarTareas();
-
-}
-
+    }
 });
-
-
-
